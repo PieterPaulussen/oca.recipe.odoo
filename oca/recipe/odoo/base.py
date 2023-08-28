@@ -164,13 +164,6 @@ class BaseRecipe(object):
     # Can be 'filename' or 'http-head'
     main_http_caching = 'filename'
 
-    is_git_layout = False
-    """True if this is the git layout, as seen from the move to GitHub.
-
-    In this layout, the standard addons other than ``base`` are in a ``addons``
-    directory right next to the ``odoo`` package.
-    """
-
     with_odoo_requirements_file = False
     """Whether attempt to use the 'requirements.txt' shipping with Odoo"""
 
@@ -1583,10 +1576,6 @@ class BaseRecipe(object):
                             to properly insert right after them
         """
         odoo_git_addons = join(self.odoo_dir, 'addons')
-        if not os.path.isdir(odoo_git_addons):
-            return
-
-        self.is_git_layout = True
         addons_paths = self.addons_paths
 
         try:
