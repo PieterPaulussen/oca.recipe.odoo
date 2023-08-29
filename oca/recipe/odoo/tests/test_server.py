@@ -17,27 +17,7 @@ from ..testing import RecipeTestCase
 TEST_DIR = os.path.dirname(__file__)
 
 
-class TestingRecipe(ServerRecipe):
-    """A subclass helping with the fact that there are no Odoo releases.
-
-    This is merely to avoid rewriting many tests.
-    """
-    release_filenames = {'10.0': 'fake-release-%s.tgz'}
-    release_dl_url = {'10.0': 'http://release.odoo.test/src/'}
-
-    def __init__(self, buildout, name, options):
-        # we need to make buildout a regular object, because some subsystems
-        # will set extra attributes on it
-        # TODO: common inheritance base with testing.py's TestingRecipe
-        if isinstance(buildout, dict):
-            buildout = UserDict(buildout)
-        super(TestingRecipe, self).__init__(buildout, name, options)
-
-
 class TestServer(RecipeTestCase):
-
-    def make_recipe(self, name='odoo', **options):
-        self.recipe = TestingRecipe(self.buildout, name, options)
 
     def test_retrieve_addons_local(self):
         """Setting up a local addons line."""

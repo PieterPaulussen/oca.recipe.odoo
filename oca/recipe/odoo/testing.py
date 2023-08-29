@@ -20,21 +20,6 @@ COMMIT_USER_EMAIL = 'test@example.org'
 COMMIT_USER_FULL = '%s %s' % (COMMIT_USER_NAME, COMMIT_USER_EMAIL)
 
 
-class TestingRecipe(BaseRecipe):
-    """A subclass with just enough few defaults for unit testing."""
-
-    release_filenames = {'10.0': 'blob-%s.tgz'}
-    nightly_filenames = {'10.0rc1c': '10-0-nightly-%s.tbz'}
-    release_dl_url = {'10.0': 'http://release.odoo.test/src/'}
-
-    def __init__(self, buildout, name, options):
-        # we need to make buildout a regular object, because some subsystems
-        # will set extra attributes on it
-        if isinstance(buildout, dict):
-            buildout = UserDict(buildout)
-        super(TestingRecipe, self).__init__(buildout, name, options)
-
-
 class FakeRepo(vcs.base.BaseRepo):
 
     log = []

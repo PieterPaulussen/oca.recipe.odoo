@@ -136,24 +136,6 @@ class BaseRecipe(object):
 
     """
 
-    release_dl_url = {
-    }
-    """Base URLs to look for official, released versions.
-
-    There are currently no official releases for Odoo, but the recipe
-    has been designed at the time of OpenERP 6.0 and some parts of its code
-    at least expect this dict to exist. Besides, official releases may reappear
-    at some point.
-    """
-
-    nightly_dl_url = {
-        '10.0rc1c': 'http://nightly.odoo.com/10.0/nightly/src/',
-    }
-    """Base URLs to look for nightly versions.
-
-    The URL for 8.0 may have to be adapted once it's released for good.
-    This one is guessed from 7.0 and is needed by unit tests.
-    """
     recipe_requirements = ()  # distribution required for the recipe itself
     recipe_requirements_paths = ()  # a default value is useful in unit tests
     requirements = ()  # requirements for what the recipe installs to run
@@ -275,63 +257,12 @@ class BaseRecipe(object):
         self.preinstall_version_check()
 
         version_split = self.version_wanted.split()
-
-        if len(version_split) == 1:
-            # version can be a simple version name, such as 6.1-1
-            if len(self.version_wanted.split('.')[0]) == 2:
-                major_wanted = self.version_wanted[:4]
-            elif len(self.version_wanted.split('.')[0]) == 1:
-                major_wanted = self.version_wanted[:3]
-            pattern = self.release_filenames[major_wanted]
-            if pattern is None:
-                raise UserError('Odoo version %r'
-                                'is not supported' % self.version_wanted)
-
-            self.archive_filename = pattern % self.version_wanted
-            self.archive_path = join(self.downloads_dir, self.archive_filename)
-            base_url = self.options.get(
-                'base_url', self.release_dl_url[major_wanted])
-            self.sources[main_software] = (
-                'downloadable',
-                '/'.join((base_url.strip('/'), self.archive_filename)), None)
-            return
-
-        # in all other cases, the first token is the type of version
-        type_spec = version_split[0]
-        if type_spec in ('local', 'path'):
-            self.odoo_dir = join(self.buildout_dir, version_split[1])
-            self.sources[main_software] = ('local', None)
-        elif type_spec == 'url':
-            url = version_split[1]
-            self.archive_filename = urlparse(url).path.split('/')[-1]
-            self.archive_path = join(self.downloads_dir, self.archive_filename)
-            self.sources[main_software] = ('downloadable', url, None)
-        elif type_spec == 'nightly':
-            if len(version_split) != 3:
-                raise UserError(
-                    "Unrecognized nightly version specification: "
-                    "%r (expecting series, number) % version_split[1:]")
-            self.nightly_series, self.version_wanted = version_split[1:]
-            type_spec = 'downloadable'
-            if self.version_wanted == 'latest':
-                self.main_http_caching = 'http-head'
-            series = self.nightly_series
-            self.archive_filename = (
-                self.nightly_filenames[series] % self.version_wanted)
-            self.archive_path = join(self.downloads_dir, self.archive_filename)
-            base_url = self.options.get('base_url',
-                                        self.nightly_dl_url[series])
-            self.sources[main_software] = (
-                'downloadable',
-                '/'.join((base_url.strip('/'), self.archive_filename)),
-                None)
-        else:
-            # VCS types
-            type_spec, url, repo_dir, self.version_wanted = version_split[0:4]
-            options = dict(opt.split('=') for opt in version_split[4:])
-            self.odoo_dir = join(self.parts, repo_dir)
-            self.sources[main_software] = (type_spec,
-                                           (url, self.version_wanted), options)
+        # VCS types
+        type_spec, url, repo_dir, self.version_wanted = version_split[0:4]
+        options = dict(opt.split('=') for opt in version_split[4:])
+        self.odoo_dir = join(self.parts, repo_dir)
+        self.sources[main_software] = (type_spec,
+                                       (url, self.version_wanted), options)
 
     def preinstall_version_check(self):
         """Perform version checks before any attempt to install.

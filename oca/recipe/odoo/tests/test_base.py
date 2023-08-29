@@ -3,21 +3,12 @@ import pkg_resources
 from copy import deepcopy
 
 from zc.buildout import UserError
-from ..server import BaseRecipe
 from ..base import main_software
 from ..base import WITH_ODOO_REQUIREMENTS_FILE_OPTION
 from ..testing import RecipeTestCase
 from ..testing import get_vcs_log
 
 TEST_DIR = os.path.dirname(__file__)
-
-
-class TestingRecipe(BaseRecipe):
-    """A subclass with just enough few defaults for unit testing."""
-
-    release_filenames = {'10.0': 'blob-%s.tgz'}
-    nightly_filenames = {'10.0rc1c': '10.0%s.tar.gz'}
-    release_dl_url = {'10.0': 'http://release.odoo.test/src/'}
 
 
 class TestBaseRecipe(RecipeTestCase):
